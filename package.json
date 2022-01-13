@@ -1,0 +1,29 @@
+{
+  "name": "price-checker-back",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.mjs",
+  "scripts": {
+    "start": "node app.mjs",
+    "dev": "npx nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Loktysh/price-checker-back.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Loktysh/price-checker-back/issues"
+  },
+  "homepage": "https://github.com/Loktysh/price-checker-back#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.10",
+    "express": "^4.17.2",
+    "node-fetch": "^3.1.0"
+  },
+  "devDependencies": {
+    "nodemo": "^1.0.0"
+  }
+}
