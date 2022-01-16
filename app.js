@@ -1,5 +1,5 @@
 const express = require('express');
-const onlinerSearch = require('./services/searching.js');
+const ProductsController = require('./controllers/products.controller');
 const cors = require('cors');
 
 const app = express();
@@ -9,12 +9,8 @@ app.use(cors());
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
-app.post('/login', (req, res) => {});
-app.get('/goods', (req, res) => {
-  onlinerSearch(req.query.query).then(data => {
-    res.send({ ...data.products });
-  });
-});
+
+app.get('/goods', ProductsController.getProducts);
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
