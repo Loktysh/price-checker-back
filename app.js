@@ -1,5 +1,6 @@
 const express = require('express');
 const ProductsController = require('./controllers/products.controller');
+const UsersController = require('./controllers/users.controller');
 const cors = require('cors');
 
 const app = express();
@@ -12,6 +13,7 @@ app.get('/', (req, res) => {
 
 app.get('/products', ProductsController.getProducts);
 app.get('/prices', ProductsController.getPrices);
+app.post('/register', UsersController.register);
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
