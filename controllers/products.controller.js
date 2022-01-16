@@ -1,4 +1,3 @@
-const { query } = require('express');
 const ProductsService = require('../services/products.service');
 
 class ProductsController {
@@ -25,11 +24,16 @@ class ProductsController {
   }
 
   async getPrices(req, res) {
-    console.log('prices', req.query.key);
-    await ProductsService.getPrices(req.query.key).then(data => {
-      console.log('Data: ', data);
-      if (data.total === 0) return res.status(204).send();
-      return res.status(200).send(data.prices);
+    await ProductsService.getPrices(req.query.key, req.query.months).then(data => {
+      if (data.message) return res.status(204).send();
+      let prices = {
+        current: data.prices.current.amount,
+        min: data.prices.min.amount,
+        max: data.prices.max,
+        min_median: data.sale.min_prices_median.amount,
+        charts: data.chart_data.items,
+      };
+      return res.status(200).send(prices);
     });
   }
 }
