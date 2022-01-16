@@ -11,6 +11,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/goods', ProductsController.getProducts);
+app.get('/prices', ProductsController.getPrices);
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
