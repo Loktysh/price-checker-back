@@ -1,7 +1,7 @@
 const { Schema, model } = require('mongoose');
 
 const UserSchema = Schema({
-  username: {
+  login: {
     type: String,
     required: true,
     unique: true,
