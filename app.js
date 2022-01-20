@@ -1,17 +1,18 @@
 const express = require('express');
-const ProductsController = require('./controllers/products.controller');
 const cors = require('cors');
+const ProductsController = require('./controllers/products.controller');
 
 const app = express();
 const port = process.env.PORT || 3001;
 
 app.use(cors());
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
 
 app.get('/products', ProductsController.getProducts);
 app.get('/prices', ProductsController.getPrices);
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`Server launched.`);
+});
+
+app.get('/', (req, res) => {
+  res.send('Not found').status(404);
 });
