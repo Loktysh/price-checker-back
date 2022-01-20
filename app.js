@@ -20,7 +20,7 @@ app.get('/', (req, res) => {
 
 app.get('/products', ProductsController.getProducts);
 app.get('/prices', ProductsController.getPrices);
-app.post('/registration', UsersController.register);
+app.post('/registration', UsersController.registration);
 app.post('/login', UsersController.login);
 
 const init = async () => {

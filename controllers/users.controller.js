@@ -1,13 +1,12 @@
 const UsersService = require('../services/users.service');
 
 class UsersController {
-  async register(req, res) {
+  async registration(req, res) {
     try {
       const { login, password } = req.body;
       const userData = await UsersService.registration(login, password);
       return res.status(200).json(userData);
     } catch (error) {
-      console.log(error);
       res.status(400).send('User exists');
     }
   }
