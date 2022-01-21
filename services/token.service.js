@@ -10,7 +10,6 @@ class TokenService {
 
   async saveToken(id, renewToken) {
     const tokenData = await TokenModel.findOne({ userId: id });
-    console.log(tokenData);
     if (tokenData) {
       tokenData.renewToken = renewToken;
       return tokenData.save();

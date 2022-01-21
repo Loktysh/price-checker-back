@@ -22,6 +22,9 @@ app.get('/products', ProductsController.getProducts);
 app.get('/prices', ProductsController.getPrices);
 app.post('/registration', UsersController.registration);
 app.post('/login', UsersController.login);
+app.get('/', (req, res) => {
+  res.send('Not found').status(404);
+});
 
 const init = async () => {
   try {
@@ -29,9 +32,9 @@ const init = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log('Connected to MongoDB');
     app.listen(port, () => {
-      console.log(`Example app listening at http://localhost:${port}`);
+      console.log(`Server is runnging at http://localhost:${port}
+      Connected to MongoDB`);
     });
   } catch (error) {
     console.log(error);
