@@ -20,9 +20,13 @@
   },
   "homepage": "https://github.com/Loktysh/price-checker-back#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.19.1",
     "cheerio": "^1.0.0-rc.10",
     "cors": "^2.8.5",
+    "dotenv": "^12.0.4",
     "express": "^4.17.2",
+    "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.3.0",
     "mongoose": "^6.1.6",
     "node-fetch": "^2.6.6"
