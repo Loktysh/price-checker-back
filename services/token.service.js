@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken');
 
 class TokenService {
   generateTokens(user) {
-    const token = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '12h' });
-    const renewToken = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '12' });
+    const renewToken = jwt.sign({ user }, process.env.JWT_REFRESH, { expiresIn: '24h' });
     return { token, renewToken };
   }
 
@@ -18,9 +18,18 @@ class TokenService {
     return token;
   }
 
-  async verifyToken(token) {
+  async verifyAccessToken(token) {
     try {
-      const userData = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+      const userData = jwt.verify(token, process.env.JWT_SECRET);
+      return userData;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async verifyRenewToken(token) {
+    try {
+      const userData = jwt.verify(token.trim(), process.env.JWT_REFRESH);
       return userData;
     } catch (e) {
       return null;
