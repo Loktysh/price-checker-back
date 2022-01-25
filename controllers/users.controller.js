@@ -20,6 +20,26 @@ class UsersController {
       res.status(400).send('Login error');
     }
   }
+
+  async authentication(req, res) {
+    try {
+      const token = req.headers.authorization.split(' ')[1];
+      const renewToken = req.headers.authorization.split(' ')[2];
+      const userData = await UsersService.authentication(token, renewToken);
+      return res.status(200).json(userData);
+    } catch (e) {
+      res.status(403).send(`Not enough rights. ${e}`);
+    }
+  }
+
+  async findUser(req, res) {
+    try {
+      const user = await UsersService.getAllUsers();
+      return res.status(200).json(userData);
+    } catch (e) {
+      res.status(403).send('Not enough rights');
+    }
+  }
 }
 
 module.exports = new UsersController();

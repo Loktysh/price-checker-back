@@ -22,6 +22,7 @@ app.get('/products', ProductsController.getProducts);
 app.get('/prices', ProductsController.getPrices);
 app.post('/registration', UsersController.registration);
 app.post('/login', UsersController.login);
+app.post('/auth', UsersController.authentication);
 app.get('/', (req, res) => {
   res.send('Not found').status(404);
 });
