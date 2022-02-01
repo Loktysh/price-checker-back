@@ -46,6 +46,44 @@ class UsersService {
     const authData = { user: tokenPayload, ...tokens };
     return authData;
   }
+
+  async trackProduct(userId, product) {
+    UserModel.findByIdAndUpdate(userId, { $addToSet: { trackingProducts: product } }, { new: true }, function (err, user) {
+      if (err) throw new Error(err);
+    });
+    let user = await this.findUser(userId);
+    console.log(product, user.trackingProducts);
+    if (user.trackingProducts.includes(product)) {
+      return `Product ${product} is successfuly tracked`;
+    }
+    return `Product ${product} is not tracked`;
+  }
+
+  async trackingProduct(userId, product, action) {
+    let user = await this.findUser(userId);
+    if (action === 'track') {
+      UserModel.findByIdAndUpdate(userId, {$addToSet: {trackingProducts: product}}, {new: true}, function(err, user){
+        if(err) return console.log(err);
+        console.log("Обновленный объект", user);
+        
+      });
+      UserModel.find({iduserId})
+    }
+    if (action === 'untrack') {
+      UserModel.findByIdAndUpdate(userId, {$pull: {trackingProducts: product}}, {new: true}, function(err, user){
+        if(err) return console.log(err);
+        console.log("Обновленный объект", user);
+      });
+      return 'removed';
+    }
+    return user
+  }
+
+  async findUser(userId) {
+    const user = await UserModel.findOne({ _id: userId });
+    if (!user) throw new Error(`Can't find user with id ${userId}`);
+    return user;
+  }
 }
 
 module.exports = new UsersService();

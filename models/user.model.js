@@ -10,6 +10,9 @@ const UserSchema = Schema({
     type: String,
     required: true,
   },
+  trackingProducts: {
+    type: [String],
+  }
 });
 
 module.exports = model('user', UserSchema);
