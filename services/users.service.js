@@ -48,9 +48,10 @@ class UsersService {
   }
 
   async trackProduct(userId, product) {
-    UserModel.findByIdAndUpdate(userId, { $addToSet: { trackingProducts: product } }, { new: true }, function (err, user) {
-      if (err) throw new Error(err);
-    });
+    console.log('Trying track');
+    const userData = await UserModel.findByIdAndUpdate(userId, { $addToSet: { trackingProducts: product } }, { new: true });
+    const isAdded = userData.trackingProducts.includes(product);
+    return isAdded;
     let user = await this.findUser(userId);
     console.log(product, user.trackingProducts);
     if (user.trackingProducts.includes(product)) {
@@ -59,24 +60,14 @@ class UsersService {
     return `Product ${product} is not tracked`;
   }
 
-  async trackingProduct(userId, product, action) {
-    let user = await this.findUser(userId);
-    if (action === 'track') {
-      UserModel.findByIdAndUpdate(userId, {$addToSet: {trackingProducts: product}}, {new: true}, function(err, user){
-        if(err) return console.log(err);
-        console.log("Обновленный объект", user);
-        
-      });
-      UserModel.find({iduserId})
-    }
-    if (action === 'untrack') {
-      UserModel.findByIdAndUpdate(userId, {$pull: {trackingProducts: product}}, {new: true}, function(err, user){
-        if(err) return console.log(err);
-        console.log("Обновленный объект", user);
-      });
-      return 'removed';
-    }
-    return user
+  async untrackProduct(userId, product) {
+    const userData = await UserModel.findByIdAndUpdate(userId, { $pull: { trackingProducts: product } }, { new: true });
+    const isRemoved = !userData.trackingProducts.includes(product);
+    return isRemoved;
+    // if (user.trackingProducts.includes(product)) {
+    //   return `Product ${product} is successfuly removed from tracked`;
+    // }
+    // return `Product ${product} is cant remove`;
   }
 
   async findUser(userId) {

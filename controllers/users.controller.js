@@ -33,31 +33,36 @@ class UsersController {
       res.status(403).send(`Not enough rights. ${e}`);
     }
   }
- 
+
   async trackingProduct(req, res) {
     try {
       const { product, action } = req.body;
       const token = req.headers.authorization.split(' ')[1];
       const renewToken = req.headers.authorization.split(' ')[2];
-      const isAuth = await UsersService.authentication(token, renewToken);
-      if (isAuth) {
-        console.log('User ok', isAuth.user.user);
+      const userData = await UsersService.authentication(token, renewToken);
+      if (userData.user.user) {
+        console.log('User ok', userData.user.user);
         // const message = await UsersService.trackingProduct(isAuth.user.user, product, action);
         // console.log('msg', message);
 
         if (action === 'track') {
-          let a = await UsersService.trackProduct(isAuth.user.user, product);
-          console.log(a);
-          return res.status(200).json({message: a})
+          const isFulfilled = await UsersService.trackProduct(userData.user.user, product);
+          return isFulfilled
+            ? res.status(200).json({ message: 'Product tracked', ...userData })
+            : res.status(200).json({ message: 'Can not track product', ...userData });
         }
         if (action === 'untrack') {
-          
+          const isFulfilled = await UsersService.untrackProduct(userData.user.user, product);
+          return isFulfilled
+            ? res.status(200).json({ message: 'Product untracked', ...userData })
+            : res.status(400).json({ message: 'Product not untracked', ...userData });
         }
-      };
-      res.status(403).send('Not enough rights');
+      } else {
+        return;
+      }
     } catch (e) {
-      // res.status(403).send('Not enough rights');
-      res.status(403).send(e);
+      console.log(e);
+      res.status(401).send(e);
     }
   }
 
