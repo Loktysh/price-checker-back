@@ -14,7 +14,7 @@ class UsersService {
     const tokens = await TokenService.generateTokens(user);
     await TokenService.saveToken(user._id, tokens.renewToken);
     await user.save();
-    return { user: tokenPayload, ...tokens };
+    return { user: {...tokenPayload, trackingProducts: user.trackingProducts}, ...tokens };
   }
 
   async login(login, password) {
@@ -25,7 +25,7 @@ class UsersService {
     const tokenPayload = { login: user.login, user: user._id };
     const tokens = TokenService.generateTokens(user);
     await TokenService.saveToken(user._id, tokens.renewToken);
-    return { user: tokenPayload, ...tokens };
+    return { user: {...tokenPayload, trackingProducts: user.trackingProducts}, ...tokens };
   }
 
   async authentication(currentToken, currentRenewToken) {
@@ -48,26 +48,15 @@ class UsersService {
   }
 
   async trackProduct(userId, product) {
-    console.log('Trying track');
     const userData = await UserModel.findByIdAndUpdate(userId, { $addToSet: { trackingProducts: product } }, { new: true });
     const isAdded = userData.trackingProducts.includes(product);
     return isAdded;
-    let user = await this.findUser(userId);
-    console.log(product, user.trackingProducts);
-    if (user.trackingProducts.includes(product)) {
-      return `Product ${product} is successfuly tracked`;
-    }
-    return `Product ${product} is not tracked`;
   }
 
   async untrackProduct(userId, product) {
     const userData = await UserModel.findByIdAndUpdate(userId, { $pull: { trackingProducts: product } }, { new: true });
     const isRemoved = !userData.trackingProducts.includes(product);
     return isRemoved;
-    // if (user.trackingProducts.includes(product)) {
-    //   return `Product ${product} is successfuly removed from tracked`;
-    // }
-    // return `Product ${product} is cant remove`;
   }
 
   async findUser(userId) {

@@ -19,6 +19,7 @@ class UsersController {
       const userData = await UsersService.login(login, password);
       return res.status(200).json(userData);
     } catch (e) {
+      console.log(e);
       res.status(400).send('Login error');
     }
   }
@@ -40,29 +41,20 @@ class UsersController {
       const token = req.headers.authorization.split(' ')[1];
       const renewToken = req.headers.authorization.split(' ')[2];
       const userData = await UsersService.authentication(token, renewToken);
-      if (userData.user.user) {
-        console.log('User ok', userData.user.user);
-        // const message = await UsersService.trackingProduct(isAuth.user.user, product, action);
-        // console.log('msg', message);
-
-        if (action === 'track') {
-          const isFulfilled = await UsersService.trackProduct(userData.user.user, product);
-          return isFulfilled
-            ? res.status(200).json({ message: 'Product tracked', ...userData })
-            : res.status(200).json({ message: 'Can not track product', ...userData });
-        }
-        if (action === 'untrack') {
-          const isFulfilled = await UsersService.untrackProduct(userData.user.user, product);
-          return isFulfilled
-            ? res.status(200).json({ message: 'Product untracked', ...userData })
-            : res.status(400).json({ message: 'Product not untracked', ...userData });
-        }
-      } else {
-        return;
+      if (action === 'track') {
+        const isFulfilled = await UsersService.trackProduct(userData.user.user, product);
+        return isFulfilled
+          ? res.status(200).json({ message: 'Product tracked', ...userData })
+          : res.status(200).json({ message: 'Can not track product', ...userData });
+      }
+      if (action === 'untrack') {
+        const isFulfilled = await UsersService.untrackProduct(userData.user.user, product);
+        return isFulfilled
+          ? res.status(200).json({ message: 'Product untracked', ...userData })
+          : res.status(400).json({ message: 'Product not untracked', ...userData });
       }
     } catch (e) {
-      console.log(e);
-      res.status(401).send(e);
+      res.status(401).send('Unathorized: ' + e);
     }
   }
 
