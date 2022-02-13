@@ -1,7 +1,9 @@
 const bcrypt = require('bcrypt');
 const TokenModel = require('../models/token.model');
 const UserModel = require('../models/user.model');
+const TrackingProductModel = require('../models/tracking-product.model');
 const TokenService = require('../services/token.service');
+
 class UsersService {
   async registration(login, password) {
     const isUserExist = await UserModel.findOne({ login });
@@ -47,16 +49,66 @@ class UsersService {
     return authData;
   }
 
-  async trackProduct(userId, product) {
-    const userData = await UserModel.findByIdAndUpdate(userId, { $addToSet: { trackingProducts: product } }, { new: true });
-    const isAdded = userData.trackingProducts.includes(product);
-    return isAdded;
+  async trackProduct(login, product) {
+    try {
+      console.log('_____');
+      console.log('Tracking...');
+      const isProductInDB = TrackingProductModel.findOne({ key: product });
+      const isProductTracking = TrackingProductModel.findOne({ key: product, subscribers: login });
+      const isTrackingByUser = UserModel.findOne({ login: login, trackingProducts: product });
+      console.log('Уже есть в trackingProducts: ', !!await isTrackingByUser.clone());
+      // console.log('Продукт отслеживается пользователем: ', !!await isProductTracking);
+      const isAdded = async () => !!await isProductTracking.clone() && !!await isTrackingByUser.clone();
+      if (!await isProductInDB) {
+        console.log('Добавляем новый продукт в бд');
+        const newProduct = await new TrackingProductModel({ key: product, subscribers: [] });
+        await newProduct.save();
+      }
+      if (!await isProductTracking) {
+        console.log('Добавляем отслеживание продукта для пользователя');
+        await TrackingProductModel.findOneAndUpdate({ key: product }, { $addToSet: { subscribers: login } }, { new: true });
+        // await UserModel.findByIdAndUpdate(userId, { $addToSet: { trackingProducts: product } }, { new: true });
+        await UserModel.findOneAndUpdate({login: login}, { $addToSet: { trackingProducts: product } }, { new: true });
+      }
+      console.log('Успешно добавлено: ', await isAdded());
+      return true;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+    // const userData = await TrackingProductModel.findByIdAndUpdate(userId, { $addToSet: { trackingProducts: product } }, { new: true });
+    // const isAlreadyTracked = await TrackingProductModel.findOne({key: product });
+    // console.log('Уже отслеживается: ', isAlreadyTracked);
+    // const newProduct = await new TrackingProductModel({ key: product });
+    // await newProduct.save();
+
+    // const userData = await UserModel.findByIdAndUpdate(userId, { $pull: { trackingProducts: product } }, { new: true });
+    // const isRemoved = !userData.trackingProducts.includes(product);
+    // return isRemoved;
   }
 
-  async untrackProduct(userId, product) {
-    const userData = await UserModel.findByIdAndUpdate(userId, { $pull: { trackingProducts: product } }, { new: true });
-    const isRemoved = !userData.trackingProducts.includes(product);
-    return isRemoved;
+  async untrackProduct(login, product) {
+    try {
+      console.log('_____');
+      console.log('Untracking...');
+      const isProductInDB = TrackingProductModel.findOne({ key: product });
+      const isProductTracking = TrackingProductModel.findOne({ key: product, subscribers: login });
+      const isTrackingByUser = UserModel.findOne({ login: login, trackingProducts: product });
+      const isFulfilled = async () => !!await isProductTracking.clone() && !!await isTrackingByUser.clone();
+      console.log('Уже отслеживается пользователем: ', await isFulfilled());
+      if (await isProductTracking && await isTrackingByUser) {
+        console.log('Убираем отслеживание продукта для пользователя');
+        await TrackingProductModel.findOneAndUpdate({ key: product }, { $pull: { subscribers: login } }, { new: true });
+        await UserModel.findOneAndUpdate({ login: login }, { $pull: { trackingProducts: product } }, { new: true });
+        await isProductInDB.clone().subscribers ?? await isProductInDB.clone().deleteOne();
+      }
+
+      console.log('Успешно добавлено: ', await isFulfilled());
+      return true;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
   }
 
   async findUser(userId) {

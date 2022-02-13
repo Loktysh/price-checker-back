@@ -42,13 +42,13 @@ class UsersController {
       const renewToken = req.headers.authorization.split(' ')[2];
       const userData = await UsersService.authentication(token, renewToken);
       if (action === 'track') {
-        const isFulfilled = await UsersService.trackProduct(userData.user.user, product);
+        const isFulfilled = await UsersService.trackProduct(userData.user.login, product);
         return isFulfilled
           ? res.status(200).json({ message: 'Product tracked', ...userData })
-          : res.status(200).json({ message: 'Can not track product', ...userData });
+          : res.status(400).json({ message: 'Can not track product', ...userData });
       }
       if (action === 'untrack') {
-        const isFulfilled = await UsersService.untrackProduct(userData.user.user, product);
+        const isFulfilled = await UsersService.untrackProduct(userData.user.login, product);
         return isFulfilled
           ? res.status(200).json({ message: 'Product untracked', ...userData })
           : res.status(400).json({ message: 'Product not untracked', ...userData });
