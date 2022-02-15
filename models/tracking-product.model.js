@@ -8,6 +8,9 @@ const TrackingProductSchema = Schema({
   subscribers: {
     type: [String],
   },
+  charts: {
+    type: [Object],
+  },
   extended_name: {
     type: String,
   },

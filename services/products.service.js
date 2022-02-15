@@ -44,28 +44,8 @@ class ProductsService {
   }
 
   async getDBPrices(key) {
-    // let res = (await TrackingProductModel.findOne({ key: key })).key;
-    let res = {
-      chartsDB: [
-        {
-          date: '2021-09-20-09',
-          price: '488.17',
-        },
-        {
-          date: '2021-09-20-12',
-          price: '550.00',
-        },
-        {
-          date: '2021-09-20-18',
-          price: '678.89',
-        },
-        {
-          date: '2021-09-20-21',
-          price: '656.50',
-        },
-      ],
-    };
-    return res;
+    const prices = await TrackingProductModel.findOne({ key: key });
+    return { dbCharts: prices.charts };
   }
 }
 
