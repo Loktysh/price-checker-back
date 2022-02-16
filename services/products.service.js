@@ -45,7 +45,7 @@ class ProductsService {
 
   async getDBPrices(key) {
     const prices = await TrackingProductModel.findOne({ key: key });
-    return { dbCharts: prices.charts };
+    return { dbCharts: !prices ? [] : prices.charts };
   }
 }
 
