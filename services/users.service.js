@@ -16,7 +16,7 @@ class UsersService {
     const tokens = await TokenService.generateTokens(user);
     await TokenService.saveToken(user._id, tokens.renewToken);
     await user.save();
-    return { user: {...tokenPayload, trackingProducts: user.trackingProducts}, ...tokens };
+    return { user: { ...tokenPayload, trackingProducts: user.trackingProducts }, ...tokens };
   }
 
   async login(login, password) {
@@ -27,7 +27,7 @@ class UsersService {
     const tokenPayload = { login: user.login, user: user._id };
     const tokens = TokenService.generateTokens(user);
     await TokenService.saveToken(user._id, tokens.renewToken);
-    return { user: {...tokenPayload, trackingProducts: user.trackingProducts}, ...tokens };
+    return { user: { ...tokenPayload, trackingProducts: user.trackingProducts }, ...tokens };
   }
 
   async authentication(currentToken, currentRenewToken) {
@@ -45,7 +45,10 @@ class UsersService {
         await TokenService.saveToken(user._id, tokens.renewToken);
       } else throw new Error('Wrong renewToken');
     }
-    const authData = { user: { ...tokenPayload, trackingProducts: user.trackingProducts }, ...tokens };
+    const authData = {
+      user: { ...tokenPayload, trackingProducts: user.trackingProducts },
+      ...tokens,
+    };
     return authData;
   }
 
@@ -53,22 +56,42 @@ class UsersService {
     try {
       console.log('_____');
       console.log('Tracking...');
+      const telegramID = (await UserModel.findOne({ login })).telegramID;
       const isProductInDB = TrackingProductModel.findOne({ key: product });
       const isProductTracking = TrackingProductModel.findOne({ key: product, subscribers: login });
       const isTrackingByUser = UserModel.findOne({ login: login, trackingProducts: product });
-      console.log('Уже есть в trackingProducts: ', !!await isTrackingByUser.clone());
-      // console.log('Продукт отслеживается пользователем: ', !!await isProductTracking);
-      const isAdded = async () => !!await isProductTracking.clone() && !!await isTrackingByUser.clone();
-      if (!await isProductInDB) {
+      const isNotificationOn = async () =>
+        !!(await UserModel.findOne({ login: login, isNotificationOn: true }));
+      console.log('Telegram subscriber:', await isNotificationOn());
+      console.log('tlgid', telegramID);
+      console.log('Уже есть в trackingProducts: ', !!(await isTrackingByUser.clone()));
+      const isAdded = async () =>
+        !!(await isProductTracking.clone()) && !!(await isTrackingByUser.clone());
+      if (!(await isProductInDB)) {
         console.log('Добавляем новый продукт в бд');
         const newProduct = await new TrackingProductModel({ key: product, subscribers: [] });
         await newProduct.save();
       }
-      if (!await isProductTracking) {
+      if (!(await isProductTracking)) {
         console.log('Добавляем отслеживание продукта для пользователя');
-        await TrackingProductModel.findOneAndUpdate({ key: product }, { $addToSet: { subscribers: login } }, { new: true });
-        // await UserModel.findByIdAndUpdate(userId, { $addToSet: { trackingProducts: product } }, { new: true });
-        await UserModel.findOneAndUpdate({login: login}, { $addToSet: { trackingProducts: product } }, { new: true });
+        await TrackingProductModel.findOneAndUpdate(
+          { key: product },
+          { $addToSet: { subscribers: login } },
+          { new: true }
+        );
+        if (await isNotificationOn()) {
+          console.log('Добавляем продукт для уведомлений пользователю');
+          await TrackingProductModel.findOneAndUpdate(
+            { key: product },
+            { $addToSet: { botSubscribers: telegramID } },
+            { new: true }
+          );
+        }
+        await UserModel.findOneAndUpdate(
+          { login: login },
+          { $addToSet: { trackingProducts: product } },
+          { new: true }
+        );
       }
       console.log('Успешно добавлено: ', await isAdded());
       return true;
@@ -76,34 +99,45 @@ class UsersService {
       console.log(e);
       return false;
     }
-    // const userData = await TrackingProductModel.findByIdAndUpdate(userId, { $addToSet: { trackingProducts: product } }, { new: true });
-    // const isAlreadyTracked = await TrackingProductModel.findOne({key: product });
-    // console.log('Уже отслеживается: ', isAlreadyTracked);
-    // const newProduct = await new TrackingProductModel({ key: product });
-    // await newProduct.save();
-
-    // const userData = await UserModel.findByIdAndUpdate(userId, { $pull: { trackingProducts: product } }, { new: true });
-    // const isRemoved = !userData.trackingProducts.includes(product);
-    // return isRemoved;
   }
 
   async untrackProduct(login, product) {
     try {
       console.log('_____');
       console.log('Untracking...');
+      const telegramID = (await UserModel.findOne({ login })).telegramID;
       const isProductInDB = TrackingProductModel.findOne({ key: product });
       const isProductTracking = TrackingProductModel.findOne({ key: product, subscribers: login });
       const isTrackingByUser = UserModel.findOne({ login: login, trackingProducts: product });
-      const isFulfilled = async () => !!await isProductTracking.clone() && !!await isTrackingByUser.clone();
+      const isFulfilled = async () =>
+        !!(await isProductTracking.clone()) && !!(await isTrackingByUser.clone());
       console.log('Уже отслеживается пользователем: ', await isFulfilled());
-      if (await isProductTracking && await isTrackingByUser) {
+      if ((await isProductTracking) && (await isTrackingByUser)) {
         console.log('Убираем отслеживание продукта для пользователя');
-        await TrackingProductModel.findOneAndUpdate({ key: product }, { $pull: { subscribers: login } }, { new: true });
-        await UserModel.findOneAndUpdate({ login: login }, { $pull: { trackingProducts: product } }, { new: true });
-        await isProductInDB.clone().subscribers ?? await isProductInDB.clone().deleteOne();
+        await TrackingProductModel.findOneAndUpdate(
+          { key: product },
+          { $pull: { subscribers: login } },
+          { new: true }
+        );
+        await TrackingProductModel.findOneAndUpdate(
+          { key: product },
+          { $pull: { botSubscribers: telegramID } },
+          { new: true }
+        );
+        await UserModel.findOneAndUpdate(
+          { login: login },
+          { $pull: { trackingProducts: product } },
+          { new: true }
+        );
+        console.log((await isProductInDB.clone()).subscribers);
+        console.log((await isProductInDB.clone()).botSubscribers);
+        const isNoSubscriptions =
+          !(await isProductInDB.clone()).subscribers.length &&
+          !(await isProductInDB.clone()).botSubscribers.length;
+        console.log('TA', isNoSubscriptions);
+        if (isNoSubscriptions) await isProductInDB.clone().deleteOne();
       }
-
-      console.log('Успешно добавлено: ', await isFulfilled());
+      console.log('Успешно удалено: ', await isFulfilled());
       return true;
     } catch (e) {
       console.log(e);

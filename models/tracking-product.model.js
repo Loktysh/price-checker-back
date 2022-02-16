@@ -8,6 +8,9 @@ const TrackingProductSchema = Schema({
   subscribers: {
     type: [String],
   },
+  botSubscribers: {
+    type: [String],
+  },
   charts: {
     type: [Object],
   },
@@ -26,6 +29,9 @@ const TrackingProductSchema = Schema({
   priceMin: {
     type: String,
   },
+  lastPrice: {
+    type: Number,
+  }
 });
 
 module.exports = model('tracked-product', TrackingProductSchema);

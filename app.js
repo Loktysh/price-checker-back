@@ -5,7 +5,7 @@ const UsersController = require('./controllers/users.controller');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const parser = require('body-parser');
-
+const test = require('./services/users.service');
 const app = express();
 const port = process.env.PORT || 3001;
 dotenv.config();
@@ -39,6 +39,7 @@ const init = async () => {
       console.log(`Server is runnging at http://localhost:${port}
       Connected to MongoDB`);
     });
+    test.untrackProduct('123123', 'I1ntel Core');
   } catch (error) {
     console.log(error);
   }

@@ -12,6 +12,12 @@ const UserSchema = Schema({
   },
   trackingProducts: {
     type: [String],
+  },
+  telegramID: {
+    type: String,
+  },
+  isNotificationOn: {
+    type: Boolean,
   }
 });
 
