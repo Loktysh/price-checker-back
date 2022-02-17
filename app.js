@@ -5,7 +5,7 @@ const UsersController = require('./controllers/users.controller');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const parser = require('body-parser');
-
+const test = require('./services/users.service');
 const app = express();
 const port = process.env.PORT || 3001;
 dotenv.config();
@@ -19,10 +19,12 @@ app.get('/', (req, res) => {
 });
 
 app.get('/products', ProductsController.getProducts);
+app.get('/product', ProductsController.getProduct);
 app.get('/prices', ProductsController.getPrices);
 app.post('/registration', UsersController.registration);
 app.post('/login', UsersController.login);
 app.post('/auth', UsersController.authentication);
+app.post('/products/track', (req, res) => UsersController.trackingProduct(req, res));
 app.get('/', (req, res) => {
   res.send('Not found').status(404);
 });

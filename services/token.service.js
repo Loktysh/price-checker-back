@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken');
 
 class TokenService {
   generateTokens(user) {
-    const token = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '12' });
-    const renewToken = jwt.sign({ user }, process.env.JWT_REFRESH, { expiresIn: '24h' });
+    const token = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '10d' });
+    const renewToken = jwt.sign({ user }, process.env.JWT_REFRESH, { expiresIn: '10d' });
     return { token, renewToken };
   }
 

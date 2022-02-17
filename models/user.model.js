@@ -10,6 +10,15 @@ const UserSchema = Schema({
     type: String,
     required: true,
   },
+  trackingProducts: {
+    type: [String],
+  },
+  telegramID: {
+    type: String,
+  },
+  isNotificationOn: {
+    type: Boolean,
+  }
 });
 
 module.exports = model('user', UserSchema);
