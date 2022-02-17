@@ -2,8 +2,8 @@ const fetch = require('node-fetch');
 const TrackingProductModel = require('../models/tracking-product.model');
 
 class ProductsService {
-  async getProducts(name) {
-    return fetch(`https://www.onliner.by/sdapi/catalog.api/search/products?query=${name}`)
+  async getProducts(name, page = 1) {
+    return fetch(`https://www.onliner.by/sdapi/catalog.api/search/products?query=${name}&page=${page}`)
       .then(res => res.json())
       .then(data => {
         let allProducts = [];

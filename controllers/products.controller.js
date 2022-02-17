@@ -2,10 +2,10 @@ const ProductsService = require('../services/products.service');
 
 class ProductsController {
   async getProducts(req, res) {
-    if (!req.query.query) {
-      return res.status(204).send(result);
+    if (!req.query.query || !req.query.page) {
+      return res.status(400).send('Wrong query');
     }
-    const data = await ProductsService.getProducts(req.query.query);
+    const data = await ProductsService.getProducts(req.query.query, req.query.page);
     return res.status(200).send(data);
   }
 
