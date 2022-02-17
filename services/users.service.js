@@ -54,7 +54,6 @@ class UsersService {
 
   async trackProduct(login, product) {
     try {
-      console.log('_____');
       console.log('Tracking...');
       const telegramID = (await UserModel.findOne({ login })).telegramID;
       const isProductInDB = TrackingProductModel.findOne({ key: product });
@@ -63,7 +62,6 @@ class UsersService {
       const isNotificationOn = async () =>
         !!(await UserModel.findOne({ login: login, isNotificationOn: true }));
       console.log('Telegram subscriber:', await isNotificationOn());
-      console.log('tlgid', telegramID);
       console.log('Уже есть в trackingProducts: ', !!(await isTrackingByUser.clone()));
       const isAdded = async () =>
         !!(await isProductTracking.clone()) && !!(await isTrackingByUser.clone());
@@ -103,7 +101,6 @@ class UsersService {
 
   async untrackProduct(login, product) {
     try {
-      console.log('_____');
       console.log('Untracking...');
       const telegramID = (await UserModel.findOne({ login })).telegramID;
       const isProductInDB = TrackingProductModel.findOne({ key: product });
@@ -129,8 +126,6 @@ class UsersService {
           { $pull: { trackingProducts: product } },
           { new: true }
         );
-        console.log((await isProductInDB.clone()).subscribers);
-        console.log((await isProductInDB.clone()).botSubscribers);
         const isNoSubscriptions =
           !(await isProductInDB.clone()).subscribers.length &&
           !(await isProductInDB.clone()).botSubscribers.length;
