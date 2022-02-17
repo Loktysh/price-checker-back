@@ -39,7 +39,6 @@ const init = async () => {
       console.log(`Server is runnging at http://localhost:${port}
       Connected to MongoDB`);
     });
-    test.untrackProduct('123123', 'I1ntel Core');
   } catch (error) {
     console.log(error);
   }
