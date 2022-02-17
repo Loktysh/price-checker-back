@@ -16,7 +16,6 @@ class ProductsController {
     const productData = await ProductsService.getProduct(req.query.key);
     const prices = await ProductsService.getPrices(req.query.key);
     const dbPrices = await ProductsService.getDBPrices(req.query.key);
-    console.log(dbPrices);
     return res.status(200).send({ ...productData, prices: { ...prices, ...dbPrices } });
   }
 

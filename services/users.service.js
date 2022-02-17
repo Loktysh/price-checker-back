@@ -129,7 +129,6 @@ class UsersService {
         const isNoSubscriptions =
           !(await isProductInDB.clone()).subscribers.length &&
           !(await isProductInDB.clone()).botSubscribers.length;
-        console.log('TA', isNoSubscriptions);
         if (isNoSubscriptions) await isProductInDB.clone().deleteOne();
       }
       console.log('Успешно удалено: ', await isFulfilled());
