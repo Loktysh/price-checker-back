@@ -16,7 +16,14 @@ class UsersService {
     const tokens = await TokenService.generateTokens(user);
     await TokenService.saveToken(user._id, tokens.renewToken);
     await user.save();
-    return { user: { ...tokenPayload, trackingProducts: user.trackingProducts }, ...tokens };
+    return {
+      user: {
+        ...tokenPayload,
+        trackingProducts: user.trackingProducts,
+        isNotificationOn: user.isNotificationOn,
+      },
+      ...tokens,
+    };
   }
 
   async login(login, password) {
@@ -27,7 +34,14 @@ class UsersService {
     const tokenPayload = { login: user.login, user: user._id };
     const tokens = TokenService.generateTokens(user);
     await TokenService.saveToken(user._id, tokens.renewToken);
-    return { user: { ...tokenPayload, trackingProducts: user.trackingProducts }, ...tokens };
+    return {
+      user: {
+        ...tokenPayload,
+        trackingProducts: user.trackingProducts,
+        isNotificationOn: user.isNotificationOn,
+      },
+      ...tokens,
+    };
   }
 
   async authentication(currentToken, currentRenewToken) {
@@ -46,7 +60,11 @@ class UsersService {
       } else throw new Error('Wrong renewToken');
     }
     const authData = {
-      user: { ...tokenPayload, trackingProducts: user.trackingProducts },
+      user: {
+        ...tokenPayload,
+        trackingProducts: user.trackingProducts,
+        isNotificationOn: user.isNotificationOn,
+      },
       ...tokens,
     };
     return authData;

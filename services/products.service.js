@@ -2,8 +2,10 @@ const fetch = require('node-fetch');
 const TrackingProductModel = require('../models/tracking-product.model');
 
 class ProductsService {
-  async getProducts(name) {
-    return fetch(`https://www.onliner.by/sdapi/catalog.api/search/products?query=${name}`)
+  async getProducts(name, page = 1) {
+    return fetch(
+      `https://www.onliner.by/sdapi/catalog.api/search/products?query=${name}&page=${page}`
+    )
       .then(res => res.json())
       .then(data => {
         let allProducts = [];
@@ -19,7 +21,7 @@ class ProductsService {
           };
           allProducts.push(productData);
         });
-        return {products: allProducts};
+        return { products: allProducts };
       });
   }
 
@@ -27,18 +29,31 @@ class ProductsService {
     return (await this.getProducts(key)).products[0];
   }
 
+  async getLastProducts(count) {
+    const products = await TrackingProductModel.find().sort('-created_at');
+    return products
+      .reverse()
+      .splice(0, count)
+      .map(product => {
+        return {
+          key: product.key,
+          lastPrice: product.lastPrice || null,
+        };
+      });
+  }
+
   async getPrices(key, months = 6) {
     return fetch(`https://catalog.api.onliner.by/products/${key}/prices-history?period=${months}m`)
       .then(res => res.json())
       .then(data => {
-        if (data.message) return res.status(204).send();
+        if (data.message) return null;
         const prices = {
           charts: data.chart_data.items,
           current: data.prices.current.amount,
           min: data.prices.min.amount,
           max: data.prices.max,
           min_median: data.sale.min_prices_median.amount,
-        }
+        };
         return prices;
       });
   }
