@@ -27,6 +27,10 @@ class ProductsService {
     return (await this.getProducts(key)).products[0];
   }
 
+  async getLastProducts(count) {
+    return (await TrackingProductModel.find().sort('-created_at')).reverse().splice(0, count);
+  }
+
   async getPrices(key, months = 6) {
     return fetch(`https://catalog.api.onliner.by/products/${key}/prices-history?period=${months}m`)
       .then(res => res.json())

@@ -25,6 +25,7 @@ app.post('/registration', UsersController.registration);
 app.post('/login', UsersController.login);
 app.post('/auth', UsersController.authentication);
 app.post('/products/track', (req, res) => UsersController.trackingProduct(req, res));
+app.get('/products/last', ProductsController.getLastProducts);
 app.get('/', (req, res) => {
   res.send('Not found').status(404);
 });

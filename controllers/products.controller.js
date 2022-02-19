@@ -19,6 +19,14 @@ class ProductsController {
     return res.status(200).send({ ...productData, prices: { ...prices, ...dbPrices } });
   }
 
+  async getLastProducts(req, res) {
+    if (!req.query.count) {
+      return res.status(400).send('Wrong count');
+    }
+    const data = await ProductsService.getLastProducts(req.query.count);
+    return res.status(200).send(data);
+  }
+
   async getPrices(req, res) {
     const prices = await ProductsService.getPrices(req.query.key, req.query.months)
     return res.status(200).send({ prices: prices });
