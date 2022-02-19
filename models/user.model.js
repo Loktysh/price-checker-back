@@ -18,6 +18,7 @@ const UserSchema = Schema({
   },
   isNotificationOn: {
     type: Boolean,
+    default: false,
   }
 });
 
