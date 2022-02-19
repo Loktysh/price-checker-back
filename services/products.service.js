@@ -30,14 +30,16 @@ class ProductsService {
   }
 
   async getLastProducts(count) {
-    let products = await TrackingProductModel.find().sort('-created_at');
-    products.reverse().splice(0, count);
-    return products.map(product => {
-      return {
-        key: product.key,
-        lastPrice: product.lastPrice || null
-      };
-    });
+    const products = await TrackingProductModel.find().sort('-created_at');
+    return products
+      .reverse()
+      .splice(0, count)
+      .map(product => {
+        return {
+          key: product.key,
+          lastPrice: product.lastPrice || null,
+        };
+      });
   }
 
   async getPrices(key, months = 6) {
