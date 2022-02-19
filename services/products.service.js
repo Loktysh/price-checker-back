@@ -35,7 +35,7 @@ class ProductsService {
     return fetch(`https://catalog.api.onliner.by/products/${key}/prices-history?period=${months}m`)
       .then(res => res.json())
       .then(data => {
-        if (data.message) return res.status(204).send();
+        if (data.message) return null;
         const prices = {
           charts: data.chart_data.items,
           current: data.prices.current.amount,
