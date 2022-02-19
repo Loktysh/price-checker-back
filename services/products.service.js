@@ -3,7 +3,9 @@ const TrackingProductModel = require('../models/tracking-product.model');
 
 class ProductsService {
   async getProducts(name, page = 1) {
-    return fetch(`https://www.onliner.by/sdapi/catalog.api/search/products?query=${name}&page=${page}`)
+    return fetch(
+      `https://www.onliner.by/sdapi/catalog.api/search/products?query=${name}&page=${page}`
+    )
       .then(res => res.json())
       .then(data => {
         let allProducts = [];
@@ -19,7 +21,7 @@ class ProductsService {
           };
           allProducts.push(productData);
         });
-        return {products: allProducts};
+        return { products: allProducts };
       });
   }
 
@@ -28,7 +30,14 @@ class ProductsService {
   }
 
   async getLastProducts(count) {
-    return (await TrackingProductModel.find().sort('-created_at')).reverse().splice(0, count);
+    let products = await TrackingProductModel.find().sort('-created_at');
+    products.reverse().splice(0, count);
+    return products.map(product => {
+      return {
+        key: product.key,
+        lastPrice: product.lastPrice || null
+      };
+    });
   }
 
   async getPrices(key, months = 6) {
@@ -42,7 +51,7 @@ class ProductsService {
           min: data.prices.min.amount,
           max: data.prices.max,
           min_median: data.sale.min_prices_median.amount,
-        }
+        };
         return prices;
       });
   }
