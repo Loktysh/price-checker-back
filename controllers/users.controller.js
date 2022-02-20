@@ -58,6 +58,16 @@ class UsersController {
     }
   }
 
+  async getUserProducts(req, res) {
+    try {
+      if (!req.query.user) throw new Error('Not valid username');
+      const userProducts = await UsersService.getProducts(req.query.user);
+      return res.status(200).send(userProducts);
+    } catch (e) {
+      res.status(403).send(`Can't get user profile. ${e}`);
+    }
+  }
+
   async findUser(req, res) {
     try {
       const user = await UsersService.getAllUsers();

@@ -21,6 +21,7 @@ app.get('/', (req, res) => {
 app.get('/products', ProductsController.getProducts);
 app.get('/product', ProductsController.getProduct);
 app.get('/prices', ProductsController.getPrices);
+app.get('/profile', UsersController.getUserProducts);
 app.post('/registration', UsersController.registration);
 app.post('/login', UsersController.login);
 app.post('/auth', UsersController.authentication);

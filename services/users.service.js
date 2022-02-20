@@ -162,6 +162,12 @@ class UsersService {
     if (!user) throw new Error(`Can't find user with id ${userId}`);
     return user;
   }
+
+  async getProducts(user) {
+    const userProfile = await UserModel.findOne({ login: user });
+    if (!userProfile) throw new Error(`Can't find user with login ${user}`);
+    return userProfile.trackingProducts;
+  }
 }
 
 module.exports = new UsersService();
